@@ -443,9 +443,17 @@ These repos extend the core engine:
 | [refract-demo-data](https://github.com/refract-org/refract-demo-data) | Safe, fictional datasets for the eval harness (no real PII or medical data) |
 | [refract-py](https://github.com/refract-org/refract-py) | Python SDK — typed dataclasses and pandas integration for ML workflows |
 
+### Position in the revisable-delegation loop
+
+Refract is one of five systems that each hold a step of the loop an institution runs when it delegates consequential work to machines: believe, know what can be done, decide what authority is justified, act, detect mismatch, revise. Refract holds the **detect mismatch** step: it reports that a source changed, and nothing more. The shared record shape for the loop is [STD-07, the Revisable Delegation Record](https://ethotechnics.org/standards/std-07-revisable-delegation-record).
+
+- **Canonical export**: `EvidenceEvent`, the versioned event schema (see [`SCHEMA_VERSIONING.md`](./SCHEMA_VERSIONING.md)), as NDJSON or a Merkle-manifested bundle. In STD-07 terms an `EvidenceEvent` is the raw material for a `discrepancy` record: what the prior revision said, what the new one says, and the revision that is the source. Refract does not emit STD-07 records itself, and should not: which change matters is a downstream judgment, and STD-07's `invalidated_by` conditions belong to the record that made the assumption.
+- **Wired to**: [NextConsensus](https://nextconsensus.com), which consumes the `@refract-org/analyzers`, `@refract-org/evidence-graph`, and `@refract-org/ingestion` packages through one adapter file. This is the only code-level edge among the five systems as of September 2026, and it is documented in [`docs/refract-and-nextconsensus.md`](./docs/refract-and-nextconsensus.md) and [`docs/repository-boundary.md`](./docs/repository-boundary.md). Nothing else consumes Refract, and Refract consumes no sibling.
+- **Siblings**: [Ambit](https://github.com/zz-plant/ambit) (capability and authorization), [Whether](https://github.com/zz-plant/whether) (act), [Ethotechnics](https://ethotechnics.org) (the record shape and the vocabulary).
+
 ### Related projects
 
 - [**Stims**](https://github.com/zz-plant/stims) — Browser music visualizer inspired by MilkDrop
 - [**sabnzbd-mcp**](https://github.com/zz-plant/sabnzbd-mcp) — MCP server for SABnzbd (zero deps)
 - [**neckass**](https://github.com/zz-plant/neckass) — Privacy-first headline generator
-- [**ethotechnics.org**](https://github.com/zz-plant/ethotechnics.org) — Essays on ethical technology and human-centered design
+- [**ethotechnics.org**](https://github.com/zz-plant/ethotechnics.org) — Open framework for the operational accountability of high-stakes AI systems; publishes the record shape Refract's siblings share (see below)
