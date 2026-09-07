@@ -1,3 +1,17 @@
+export type {
+  DelegationRecord,
+  DiscrepancyContext,
+} from "./delegation.js";
+export {
+  canonicalizeDelegationRecord,
+  hashDelegationRecord,
+  REVISABLE_DELEGATION_SCHEMA_VERSION,
+  REVISABLE_DELEGATION_STANDARD_URL,
+  sealDelegationRecords,
+  toDelegationNdjson,
+  toDiscrepancyRecord,
+  toDiscrepancyStream,
+} from "./delegation.js";
 export { CLAIM_IDENTITY_VERSION, createClaimIdentity, createEventIdentity } from "./hash-identity.js";
 export type {
   ActivitySpikeInput,
