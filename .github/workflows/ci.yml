@@ -22,23 +22,21 @@ jobs:
       - run: bun run check:boundaries
       - run: bun run test
 
-  downstream:
-    runs-on: ubuntu-latest
-    needs: gate
-    strategy:
-      matrix:
-        repo:
-          - refract-org/refract-ui
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: ${{ matrix.repo }}
-          path: downstream/${{ matrix.repo }}
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.3.14"
-      - name: install and test
-        working-directory: downstream/${{ matrix.repo }}
-        run: |
-          bun install
-          bun run test
+# There was a `downstream` job here that checked out refract-org/refract-ui and
+# ran its test suite on every pull request and push. It could not detect a
+# regression in this repository, because refract-ui does not consume this one:
+# its package.json declares `dependencies: {}`, nothing under its src/ imports
+# an @refract-org package, and its AGENTS.md records the arrangement on purpose
+# — "Types mirror @refract-org/evidence-graph schemas (defined locally in
+# src/types.ts)". So the job installed a second repository and ran its single
+# test against its own local types, with this PR's diff nowhere in the picture.
+#
+# Measured on run 34146471011: gate 14s, downstream 8s, and because downstream
+# declared `needs: gate` it started only after gate finished — 29s of wall clock
+# for 17s of checking.
+#
+# A real downstream check is still worth having, and would have to compare
+# refract-ui's mirrored types against this repo's evidence-graph schemas, since
+# drift between them is the actual failure mode the mirror creates. Running
+# refract-ui's own suite cannot see that drift: those tests assert refract-ui
+# against the very copy that drifted.
