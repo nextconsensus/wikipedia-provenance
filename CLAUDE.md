@@ -48,6 +48,12 @@ Skipped is not passed: a green suite here has **not** verified the API
 contract. Run `REFRACT_TEST_LIVE=1 bun run test` somewhere with egress before
 trusting a change to `mediawiki-client.ts`.
 
+`.github/workflows/api-contract.yml` runs them daily and on demand, off the
+pull-request path so a Wikipedia outage cannot redden an unrelated PR. Gating
+them out of the PR gate without running them anywhere would have retired five
+tests while the suite went green — check that workflow's last run before
+trusting the parser.
+
 ## Repository Boundary
 
 Refract is domain-neutral infrastructure. Do NOT add healthcare-specific logic,
