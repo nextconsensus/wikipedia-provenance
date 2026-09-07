@@ -33,6 +33,7 @@ bun install --frozen-lockfile
 bun run build      # tsc -b (all packages)
 bun run typecheck  # tsc --noEmit
 bun run test       # vitest run (all packages)
+REFRACT_TEST_LIVE=1 bun run test   # also run the MediaWiki API contract tests
 bun run lint       # biome lint packages/
 ```
 
