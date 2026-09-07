@@ -3,6 +3,7 @@ import { Command } from "commander";
 import { buildConfig, buildObservationReport, runAnalyze } from "./commands/analyze.js";
 import { runClaim } from "./commands/claim.js";
 import { runCron } from "./commands/cron.js";
+import { DelegationInputError, runDelegation, WHEN_RULES } from "./commands/delegation.js";
 import type { DiffResult } from "./commands/diff.js";
 import { runDiff } from "./commands/diff.js";
 import { runEval } from "./commands/eval.js";
@@ -254,6 +255,41 @@ exportCmd.action(async (page, opts) => {
     config,
     !!opts.flatten,
   );
+});
+
+// ── delegation ──
+// The operator supplies every judgment: what the receiving system calls this,
+// what assumption is at stake, and which events count. None has a default.
+const delegationCmd = program
+  .command("delegation <page>")
+  .description("write STD-07 discrepancy records for another system to read")
+  .requiredOption("--subject <id>", "what the receiving system calls the thing this is about")
+  .requiredOption("--expected <clause>", "the assumption these changes would violate")
+  .requiredOption("--when <rule>", `which events count: ${Object.keys(WHEN_RULES).join(", ")}`)
+  .option("-s, --section <name>", "only events in this section")
+  .option("-o, --out <file>", "write to a file instead of stdout");
+withGlobal(delegationCmd);
+withAnalyzerConfig(delegationCmd);
+delegationCmd.action(async (page, opts) => {
+  try {
+    await runDelegation(page, {
+      subject: opts.subject as string,
+      expected: opts.expected as string,
+      when: opts.when as string,
+      section: opts.section as string | undefined,
+      out: opts.out as string | undefined,
+      apiUrl: opts.api as string | undefined,
+      auth: extractAuth(opts),
+      config: buildConfig(opts),
+    });
+  } catch (error) {
+    if (error instanceof DelegationInputError) {
+      console.error(error.message);
+      process.exitCode = 2;
+      return;
+    }
+    throw error;
+  }
 });
 
 // ── watch ──
